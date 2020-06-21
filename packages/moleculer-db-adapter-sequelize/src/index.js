@@ -123,7 +123,7 @@ class SequelizeDbAdapter {
 	 * @memberof SequelizeDbAdapter
 	 */
 	find(filters) {
-		return this.createCursor(filters);
+		return this.model.findAll(this.createCursor(filters));
 	}
 
 	/**
@@ -181,7 +181,7 @@ class SequelizeDbAdapter {
 	 * @memberof SequelizeDbAdapter
 	 */
 	count(filters = {}) {
-		return this.createCursor(filters, true);
+		return this.model.count(this.createCursor(filters));
 	}
 
 	/**
@@ -294,16 +294,10 @@ class SequelizeDbAdapter {
 	 *  - query
 	 *
  	 * @param {Object} params
- 	 * @param {Boolean} isCounting
-	 * @returns {Promise}
+	 * @returns {Object}
 	 */
-	createCursor(params, isCounting) {
-		if (!params) {
-			if (isCounting)
-				return this.model.count();
-
-			return this.model.findAll();
-		}
+	createCursor(params) {
+		if (!params) return;
 
 		const q = {
 			where: {}
@@ -351,10 +345,7 @@ class SequelizeDbAdapter {
 		if (_.isNumber(params.limit) && params.limit > 0)
 			q.limit = params.limit;
 
-		if (isCounting)
-			return this.model.count(q);
-
-		return this.model.findAll(q);
+		return q;
 	}
 
 	/**
